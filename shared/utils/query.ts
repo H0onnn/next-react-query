@@ -1,13 +1,8 @@
 import {
-  HydrationBoundary,
   QueryClient,
-  dehydrate,
-  QueryState,
-  QueryKey,
   isServer,
   defaultShouldDehydrateQuery,
 } from "@tanstack/react-query";
-import { isEqual } from "@/shared/utils/is-equal";
 
 /**
  * 주석1)
@@ -73,39 +68,3 @@ export const getQueryClient = () => {
     return browserQueryClient;
   }
 };
-
-type UnwrapPromise<T> = T extends Promise<infer U> ? U : T;
-
-interface QueryProps<ResponseType = unknown> {
-  queryKey: QueryKey;
-  queryFn: () => Promise<ResponseType>;
-}
-
-interface DehydratedQueryExtended<TData = unknown, TError = unknown> {
-  state: QueryState<TData, TError>;
-}
-
-// getQueryClient에서 생성된 client를 이용해 서버에서 prefetching 및 dehydrate한 결과물을 리턴하는 함수
-export const getDehydratedQuery = <Q extends QueryProps>({
-  queryKey,
-  queryFn,
-}: Q) => {
-  const queryClient = getQueryClient();
-
-  // prefetching => getQueryClient에서의 설정으로 인해 await 필요 없음
-  queryClient.prefetchQuery({ queryKey, queryFn });
-
-  // dehydrate
-  const { queries } = dehydrate(queryClient);
-
-  // 위 주석 2)에서 언급한 불필요한 재직렬화 문제를 해결하기 위해 쿼리 키를 비교하여 필요한 쿼리만 반환
-  const [dehydratedQuery] = queries.filter((query) =>
-    isEqual(query.queryKey, queryKey)
-  );
-
-  return dehydratedQuery as DehydratedQueryExtended<
-    UnwrapPromise<ReturnType<Q["queryFn"]>>
-  >;
-};
-
-export const Hydrate = HydrationBoundary;
