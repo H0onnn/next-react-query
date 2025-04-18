@@ -25,6 +25,10 @@ const postQueryOptions = {
     queryKey: postKeys.detail(postId),
     queryFn: () => postApi.getPost(postId),
   }),
+  create: () => ({
+    mutationKey: postKeys.all,
+    mutationFn: postApi.createPost,
+  }),
 };
 
 export default postQueryOptions;
