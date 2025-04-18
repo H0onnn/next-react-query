@@ -3,7 +3,10 @@ import {
   isServer,
   defaultShouldDehydrateQuery,
   QueryCache,
+  MutationCache,
 } from "@tanstack/react-query";
+
+import { toast } from "sonner";
 
 /**
  * 주석1)
@@ -29,6 +32,8 @@ const makeQueryClient = () => {
         // SSR 환경에서는 보통 클라이언트에서 즉시 재요청하는 것을 방지하기 위해
         // staleTime을 0보다 큰 값으로 설정
         staleTime: 60 * 1000,
+        retry: false,
+        throwOnError: true,
       },
       dehydrate: {
         shouldDehydrateQuery: (query) =>
@@ -47,7 +52,18 @@ const makeQueryClient = () => {
         console.log("fetched data: ", data);
       },
       onError: (error, query) => {
-        console.log("Query fetch failed for the queryKey: ", query.queryKey);
+        console.log(
+          "Query fetch failed for the queryKey: ",
+          query.queryKey,
+          error
+        );
+      },
+    }),
+    mutationCache: new MutationCache({
+      onSuccess: (data, variables) => {
+        toast.success("Mutation successed");
+        console.log("Mutation variables: ", variables);
+        console.log("Mutation response data: ", data);
       },
     }),
   });
