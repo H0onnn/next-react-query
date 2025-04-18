@@ -2,6 +2,7 @@ import {
   QueryClient,
   isServer,
   defaultShouldDehydrateQuery,
+  QueryCache,
 } from "@tanstack/react-query";
 
 /**
@@ -40,6 +41,15 @@ const makeQueryClient = () => {
         },
       },
     },
+    queryCache: new QueryCache({
+      onSuccess: (data, query) => {
+        console.log("Query fetch successed for the queryKey: ", query.queryKey);
+        console.log("fetched data: ", data);
+      },
+      onError: (error, query) => {
+        console.log("Query fetch failed for the queryKey: ", query.queryKey);
+      },
+    }),
   });
 };
 
