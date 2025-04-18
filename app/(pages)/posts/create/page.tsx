@@ -11,7 +11,7 @@ export default function CreatePostPage() {
         className="border border-gray-300 rounded-md p-2 cursor-pointer"
         onClick={() => createPost({ title: "test", body: "test" })}
       >
-        Create Post
+        {isPending ? "Creating..." : "Create Post"}
       </button>
     </div>
   );
